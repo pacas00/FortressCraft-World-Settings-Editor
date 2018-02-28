@@ -58,12 +58,12 @@ namespace Simple.World.Settings.Editor
 				this._worldData.Add("mnVersion", -1, true);
 
 				var fileVersion = reader.ReadInt32();
-				if (fileVersion < 0 || fileVersion > 1) // Not 0 or 1
+				if (fileVersion < 0 || fileVersion > 2) // Not 0 or 1
 				{
 					MessageBox.Show($"Error, WorldData [{file}] has stupid version of {fileVersion}");
 					return;
 				}
-				if (fileVersion != 1) // Not 1
+				if (fileVersion == 0) // Not 1
 				{
 					MessageBox.Show(fileVersion == 0 // It's a zero
 						? "Error, world.dat is full of zeros!"
@@ -100,7 +100,34 @@ namespace Simple.World.Settings.Editor
 				this._worldData.Add("mCPHCoordZ", reader.ReadInt64(), true);
 				this._worldData.Add("mbFlatland", reader.ReadBoolean(), true);
 				this._worldData.Add("mbCarePackage", reader.ReadBoolean(), true);
-			}
+
+                int mnVersion = Convert.ToInt32(this._worldData["mnVersion"]);
+
+                if (mnVersion >= 5)
+                {
+
+                    this._worldData.Add("mbSkyIslands", reader.ReadBoolean(), true);
+                    this._worldData.Add("mbAllOre", reader.ReadBoolean(), true);
+                    this._worldData.Add("mbHardcoreCeilings", reader.ReadBoolean(), true);
+                    this._worldData.Add("mbHardcoreInventory", reader.ReadBoolean(), true);
+                    this._worldData.Add("mbAggressiveMobs", reader.ReadBoolean(), true);
+                    this._worldData.Add("mbLucrativeMobs", reader.ReadBoolean(), true);
+                    this._worldData.Add("mbPandorasBoxes", reader.ReadBoolean(), true);
+                    this._worldData.Add("mbRoboMania", reader.ReadBoolean(), true);
+                    this._worldData.Add("mbOSHA", reader.ReadBoolean(), true);
+                    this._worldData.Add("mbImportantCPH", reader.ReadBoolean(), true);
+
+                }
+
+                if (mnVersion >= 6)
+                {
+                    this._worldData.Add("mnVersionCreatedIn", reader.ReadInt32(), true);
+                }
+                else
+                {
+                    this._worldData.Add("mnVersionCreatedIn", 0, true);
+                }
+            }
 
 			this.listView1.Items.Clear();
 			foreach (var kv in this._worldData)
@@ -118,7 +145,7 @@ namespace Simple.World.Settings.Editor
 				this.listView1.Items.Add(lvi);
 			}
 
-			if ((Int32) this._worldData["mnVersion"] > 4)
+			if ((Int32) this._worldData["mnVersion"] > 6)
 			{
 				MessageBox.Show(
 					"World Version is higher than this tool supports. There may be unsupported values, and can result in a corrupted world!");
@@ -169,7 +196,29 @@ namespace Simple.World.Settings.Editor
 				writer.Write((Int64) this._worldData["mCPHCoordZ"]);
 				writer.Write((Boolean) this._worldData["mbFlatland"]);
 				writer.Write((Boolean) this._worldData["mbCarePackage"]);
-			}
+
+                int mnVersion = Convert.ToInt32(this._worldData["mnVersion"]);
+
+                if (mnVersion >= 5)
+                {
+
+                    writer.Write((Boolean)this._worldData["mbSkyIslands"]);
+                    writer.Write((Boolean)this._worldData["mbAllOre"]);
+                    writer.Write((Boolean)this._worldData["mbHardcoreCeilings"]);
+                    writer.Write((Boolean)this._worldData["mbHardcoreInventory"]);
+                    writer.Write((Boolean)this._worldData["mbAggressiveMobs"]);
+                    writer.Write((Boolean)this._worldData["mbLucrativeMobs"]);
+                    writer.Write((Boolean)this._worldData["mbPandorasBoxes"]);
+                    writer.Write((Boolean)this._worldData["mbRoboMania"]);
+                    writer.Write((Boolean)this._worldData["mbOSHA"]);
+                    writer.Write((Boolean)this._worldData["mbImportantCPH"]);
+                }
+
+                if (mnVersion >= 6)
+                {
+                    writer.Write((Int32)this._worldData["mnVersionCreatedIn"]);
+                }
+            }
 
 			using (var fs = File.OpenRead(file))
 			{
